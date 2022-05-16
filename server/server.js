@@ -22,11 +22,14 @@ process.env.MONGODB_URI || 'mongodb://localhost:3000/nicoshop',
 .then(()=>{console.log("Db connection successfull")})
 .catch((err)=>{console.log(err)})
 //prevent errors with CORS
-app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true,            //access-control-allow-credentials:true
-    optionSuccessStatus: 200,
-  }))
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("build"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname,  "build", "index.html"));
+  });
+}
+
 app.use(express.json())
 app.use('/api/users',userRoute)
 app.use('/api/auth', authRoute)
